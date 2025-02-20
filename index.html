@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: black;
+            font-family: "UD デジタル 教科書体 NP-B", "UD Digi Kyokasho NP-B";
+        }
+        h1 {
+            font-size: 2.2rem;
+            font-weight: bold;
+            border-bottom: solid 2px white;
+            padding-bottom: 10px;
+        }
+        h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            /* border-bottom: solid 2px white; */
+            padding-bottom: 10px;
+            text-align: right;
+            padding-right: 30px;
+        }
+        div#dispNumber {
+            font-size: 12rem;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+        }
+        button#start {
+            font-size: 2.2rem;
+        }
+        div#result {
+            color: #46b054;
+            font-size: 12rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+  <body>
+    <div class="container">
+        <div class="row mb-3">
+            <h1 class="col-sm-12 text-center text-info mt-5">フラッシュ暗算ソフト</h1>
+        </div>
+        <div class="row mb-3">
+            <h2 class="col-sm-12 mt-2">パパ</h1>
+        </div>
+        <div class="row pb-5">
+            <button class="offset-sm-2 col-sm-8 btn btn-danger mt-2" id="start">開始</button>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" id="dispNumber"></div>
+        </div>
+        <div class="row pb-5 pt-5">
+            <div class="col-sm-12 text-center" id="result"></div>
+        </div>
+        
+    </div>
+    
+    <script>
+
+        const MAXCOUNT = 7;
+        let count = 0;
+        const MAXNUM = 10;
+        const MINNUM = 1;
+        let total = 0;
+        const INTERVAL = 1000;
+        const DELAY = 4000;
+        let previousNumber = null
+        
+        const dispNumber = document.getElementById('dispNumber');
+        const showNumber = () => {
+            let random;
+            let loop = 1;
+            do {
+                console.log(loop + '回目');
+                const sign = Math.floor(Math.random() * 4);
+                const isPlus = sign === 0 ? false : true;
+                random = Math.floor(Math.random() * (MAXNUM - MINNUM + 1)) + MINNUM; 
+                if(!isPlus && random !== 0 && count !== 0 && (total - random) > 0){
+                    random *= -1;
+                }
+                loop++;
+            } while (random === previousNumber); // 前回と同じなら振り直す
+
+            previousNumber = random; // 現在の値を保存
+
+            console.log(random);
+            dispNumber.textContent = random;
+            count++;
+            total += random;
+            console.log('合計値: ' + total);
+            if(count == MAXCOUNT + 1){
+                clearInterval(timer);
+                dispNumber.textContent = '';
+                startButton.textContent = 'こたえは。。。';
+                setTimeout(showResult, DELAY);
+            }
+        };
+
+        const result = document.getElementById('result');
+        
+        const showResult = () => {
+            result.textContent = total;
+            // result.style.borderBottom = "double 5px white";
+            startButton.disabled = false;
+            startButton.textContent = '開始';
+        };
+
+
+        const startButton = document.getElementById('start');
+        let timer;
+        startButton.addEventListener('click', () => {
+            count = 0;
+            total = 0;
+            startButton.disabled = true;
+            startButton.textContent = '動作中...'
+            result.textContent = '';
+            result.style.borderBottom = "none";
+            timer = setInterval(showNumber, INTERVAL);
+        });
+        
+        // showNumber();
+
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+  </body>
+</html>
