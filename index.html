@@ -3,12 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
+    <title>フラッシュ暗算 v1</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <style>
         body {
             background-color: black;
-            font-family: "UD デジタル 教科書体 NP-B", "UD Digi Kyokasho NP-B";
         }
         h1 {
             font-size: 2.2rem;
@@ -78,10 +77,10 @@
             let loop = 1;
             do {
                 console.log(loop + '回目');
-                const sign = Math.floor(Math.random() * 4);
-                const isPlus = sign === 0 ? false : true;
+                const sign = Math.floor(Math.random() * 2);
+                const isPlus = sign == 0 ? false : true;
                 random = Math.floor(Math.random() * (MAXNUM - MINNUM + 1)) + MINNUM; 
-                if(!isPlus && random !== 0 && count !== 0 && (total - random) > 0){
+                if(!isPlus && random !== 0 && count !== 0 && total >= random){
                     random *= -1;
                 }
                 loop++;
