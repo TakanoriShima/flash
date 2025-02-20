@@ -37,16 +37,25 @@
             color: #46b054;
             font-size: 12rem;
             font-weight: bold;
+            opacity: 1;
+            transition: all 3s ease-in-out;
+        }
+        .grow {
+            font-size: 15rem !important;
+        }
+
+        .fade-out {
+            opacity: 0 !important;
         }
     </style>
 </head>
   <body>
     <div class="container">
         <div class="row mb-3">
-            <h1 class="col-sm-12 text-center text-info mt-5">フラッシュ暗算ソフト</h1>
+            <h1 class="col-sm-12 text-center text-info mt-5">そろばんあんざんそふと</h1>
         </div>
         <div class="row mb-3">
-            <h2 class="col-sm-12 mt-2">パパ</h1>
+            <h2 class="col-sm-12 mt-2">かのんへ パパより</h1>
         </div>
         <div class="row pb-5">
             <button class="offset-sm-2 col-sm-8 btn btn-danger mt-2" id="start">開始</button>
@@ -57,74 +66,86 @@
         <div class="row pb-5 pt-5">
             <div class="col-sm-12 text-center" id="result"></div>
         </div>
-        
     </div>
-    
     <script>
 
-        const MAXCOUNT = 7;
-        let count = 0;
+        const MAXCOUNT = 5;
+        let count = 1;
         const MAXNUM = 10;
         const MINNUM = 1;
         let total = 0;
-        const INTERVAL = 3000;
-        const DELAY = 4000;
-        let previousNumber = null
-        
+        const INTERVAL = 500;
+        const DELAY = 3500;
+        const startButton = document.getElementById('start');
         const dispNumber = document.getElementById('dispNumber');
-        const showNumber = () => {
+        const result = document.getElementById('result');
+        let previousNumber = null;
+        let startTimer;
+        let stopTimer;
+        
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        const showNumber = async () => {
+            if(count == 1){
+                console.log('## =======================')
+            }
+            console.log('★ showNumber: ' + count + '回目 ★');
             let random;
-            let loop = 1;
             do {
-                console.log(loop + '回目');
-                const sign = Math.floor(Math.random() * 2);
-                const isPlus = sign == 0 ? false : true;
+                const sign = Math.random() < 0.5 ? -1 : 1;
                 random = Math.floor(Math.random() * (MAXNUM - MINNUM + 1)) + MINNUM; 
-                if(!isPlus && random !== 0 && count !== 0 && total >= random){
+                if(sign === -1 && random !== 0 && count !== 0 && total >= random){
                     random *= -1;
                 }
-                loop++;
             } while (random === previousNumber); // 前回と同じなら振り直す
 
             previousNumber = random; // 現在の値を保存
 
-            console.log(random);
+            console.log('　　乱数: ' + random);
             dispNumber.textContent = random;
-            count++;
+            startButton.textContent = 'いま: ' + total;
+            startButton.textContent = 'かのん、がんばれ！';
             total += random;
-            console.log('合計値: ' + total);
-            if(count == MAXCOUNT + 1){
-                clearInterval(timer);
-                dispNumber.textContent = '';
+            if(count >= MAXCOUNT){
                 startButton.textContent = 'こたえは。。。';
-                setTimeout(showResult, DELAY);
-            }
+                console.log('　　※ 最終合計値: ' + total);
+                clearInterval(startTimer);
+                await delay(INTERVAL);
+                dispNumber.textContent = '';
+                showResult();
+                
+            }else{
+                count++;
+                console.log('　　ここまでの合計値: ' + total);
+            }            
         };
-
-        const result = document.getElementById('result');
-        
-        const showResult = () => {
+ 
+        const showResult = async() => {
+            result.classList.remove('fade-out');
+            console.log('★ 最終結果（' + total + '）画面表示！');
+            await delay(DELAY);
             result.textContent = total;
-            // result.style.borderBottom = "double 5px white";
             startButton.disabled = false;
             startButton.textContent = '開始';
+            result.classList.add('grow');
+
+            setTimeout(() => {
+                result.classList.add('fade-out');
+            }, 3000); // 3秒後に消える
         };
 
-
-        const startButton = document.getElementById('start');
-        let timer;
         startButton.addEventListener('click', () => {
-            count = 0;
+            count = 1;
             total = 0;
-            startButton.disabled = true;
-            startButton.textContent = '動作中...'
             result.textContent = '';
-            result.style.borderBottom = "none";
-            timer = setInterval(showNumber, INTERVAL);
+            startButton.disabled = true;
+            startButton.textContent = 'がんばろう！';
+            result.textContent = '';
+            result.classList.remove('grow');
+            
+            startTimer = setInterval(showNumber, INTERVAL);
         });
         
-        // showNumber();
-
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
   </body>
