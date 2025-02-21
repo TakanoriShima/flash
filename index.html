@@ -55,7 +55,7 @@
             <h1 class="col-sm-12 text-center text-info mt-5">そろばんあんざんそふと</h1>
         </div>
         <div class="row mb-3">
-            <h2 class="col-sm-12 mt-2">かのんへ パパより</h1>
+            <h2 class="col-sm-12 mt-2">かのんへ パパより</h2>
         </div>
         <div class="row pb-5">
             <button class="offset-sm-2 col-sm-8 btn btn-danger mt-2" id="start">開始</button>
@@ -63,29 +63,60 @@
         <div class="row">
             <div class="col-sm-12" id="dispNumber"></div>
         </div>
-        <div class="row pb-5 pt-5">
+        <div class="row pb-5 pt-3">
             <div class="col-sm-12 text-center" id="result"></div>
+        </div>
+        <div class="row min-vh-70 d-flex justify-content-center align-items-center h-100 mb-3 fade-out" id="input">
+            <div class="w-50 h-100 text-center bg-white border text-end col-8" id="inputNum">　</div>
+            <button class="offset-1 col-3 btn btn-danger" id="challenge">こたえる</button>
+        </div>
+        <div class="row fade-out" id="calc">
+            <div class="row justify-content-center">
+                <button class="col-2 border btn btn-success text-white num" value="0">0</button> 
+                <button class="col-2 border btn btn-success text-white num" value="1">1</button> 
+                <button class="col-2 border btn btn-success text-white num" value="2">2</button> 
+                <button class="col-2 border btn btn-success text-white num" value="3">3</button>
+                <button class="col-2 border btn btn-success text-white num" value="4">4</button> 
+            </div>
+            <div class="row justify-content-center mt-1">
+                <button class="col-2 border btn btn-success text-white num" value="5">5</button> 
+                <button class="col-2 border btn btn-success text-white num" value="6">6</button> 
+                <button class="col-2 border btn btn-success text-white num" value="7">7</button>
+                <button class="col-2 border btn btn-success text-white num" value="8">8</button> 
+                <button class="col-2 border btn btn-success text-white num" value="9">9</button> 
+            </div>
         </div>
     </div>
     <script>
 
         const MAXCOUNT = 7;
-        let count = 1;
         const MAXNUM = 10;
         const MINNUM = 1;
+        
+        let count = 1;
         let total = 0;
-        const INTERVAL = 2500;
+
+        const INTERVAL = 1500;
         const DELAY = 3500;
         const startButton = document.getElementById('start');
         const dispNumber = document.getElementById('dispNumber');
         const result = document.getElementById('result');
+        const inputNum = document.getElementById('inputNum');
+        const input = document.getElementById('input');
+        const calc = document.getElementById('calc');
+        
         let previousNumber = null;
         let startTimer;
         let stopTimer;
         
         const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        // const music = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
         const showNumber = async () => {
+            const music = new Audio('./audios/plus.mp3');
+            music.currentTime = 0;
+            music.play();
+
             if(count == 1){
                 console.log('## =======================')
             }
@@ -107,7 +138,7 @@
             startButton.textContent = 'かのん、がんばれ！';
             total += random;
             if(count >= MAXCOUNT){
-                startButton.textContent = 'こたえは。。。';
+                startButton.textContent = 'こたえて！';
                 console.log('　　※ 最終合計値: ' + total);
                 clearInterval(startTimer);
                 await delay(INTERVAL);
@@ -121,20 +152,20 @@
         };
  
         const showResult = async() => {
-            result.classList.remove('fade-out');
+            input.classList.remove('fade-out');
+            calc.classList.remove('fade-out');
             console.log('★ 最終結果（' + total + '）画面表示！');
-            await delay(DELAY);
-            result.textContent = total;
-            startButton.disabled = false;
-            startButton.textContent = '開始';
-            result.classList.add('grow');
-
-            setTimeout(() => {
-                result.classList.add('fade-out');
-            }, 3000); // 3秒後に消える
+  
         };
 
-        startButton.addEventListener('click', () => {
+        startButton.addEventListener('click', async () => {
+            input.classList.add('fade-out');
+            calc.classList.add('fade-out');
+            const music = new Audio('./audios/q.mp3');
+            music.currentTime = 0;
+            music.play();
+            // await delay(10);
+            // music.stop();
             count = 1;
             total = 0;
             result.textContent = '';
@@ -142,10 +173,47 @@
             startButton.textContent = 'がんばろう！';
             result.textContent = '';
             result.classList.remove('grow');
-            
+            showNum = '　'
+            inputNum.textContent = showNum;
             startTimer = setInterval(showNumber, INTERVAL);
         });
-        
+
+        let showNum = '';
+        let clickCount = 0;
+        const btnClick = () => {
+            const buttons = document.getElementsByClassName('num');
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].addEventListener('click', (e) => {
+                    let value = e.target.value;
+                    showNum = showNum + Number(value);
+                    inputNum.textContent = Number(showNum);                     
+                    clickCount++;
+                });
+            }
+        }
+        btnClick();
+
+        const challenge = document.getElementById('challenge');
+        challenge.addEventListener('click', async () => {
+            input.classList.add('fade-out');
+            calc.classList.add('fade-out');
+            if(Number(showNum) == total){
+                result.textContent = '〇'
+                const music = new Audio('./audios/success.mp3');
+                music.currentTime = 0;
+                music.play();
+                console.log('正解');
+            }else{
+                result.textContent = 'X';
+                const music = new Audio('./audios/fail.mp3');
+                music.currentTime = 0;
+                music.play();
+                console.log('不正解');
+            }
+            await delay(DELAY);
+            startButton.disabled = false;
+            startButton.textContent = '開始';
+        });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
   </body>
