@@ -211,61 +211,71 @@
                         maxCount: 5,
                         maxNum: 9,
                         minNum: 1,
-                        interval: 3000
+                        interval: 3000,
+                        isSign: 0
                 },
                 2: {
                         maxCount: 8,
                         maxNum: 9,
                         minNum: 1,
-                        interval: 3000
+                        interval: 3000,
+                        isSign: 0
                 },
                 3: {
-                        maxCount: 8,
+                        maxCount: 10,
                         maxNum: 9,
                         minNum: 1,
-                        interval: 3000
+                        interval: 3000,
+                        isSign: 1
                 },
                 4: {
                         maxCount: 10,
                         maxNum: 15,
                         minNum: 1,
-                        interval: 3000
+                        interval: 3000,
+                        isSign: 1
                 },
                 5: {
                         maxCount: 10,
                         maxNum: 15,
                         minNum: 1,
-                        interval: 2000
+                        interval: 2000,
+                        isSign: 1
                 },
                 6: {
                         maxCount: 15,
                         maxNum: 15,
                         minNum: 1,
-                        interval: 2000
+                        interval: 2000,
+                        isSign: 1
                 },
                 7: {
                         maxCount: 15,
                         maxNum: 20,
                         minNum: 1,
-                        interval: 2000
+                        interval: 2000,
+                        isSign: 1
                 },
                 8: {
                         maxCount: 15,
                         maxNum: 50,
                         minNum: 1,
-                        interval: 2000
+                        interval: 2000,
+                        isSign: 1
                 },
                 9: {
                         maxCount: 17,
                         maxNum: 70,
                         minNum: 1,
-                        interval: 400
+                        interval: 400,
+                        isSign: 1
                 },
                 10: {
                         maxCount: 20,
                         maxNum: 99,
                         minNum: 1,
-                        interval: 200
+                        interval: 200,
+                        isSign: 1
                 },
             };
 
@@ -276,6 +286,7 @@
             let MAXNUM = LEVELS[currentLevel].maxNum; // 1回に表示する数字の最大値
             let MINNUM = LEVELS[currentLevel].minNum; // 1回に表示する数字の最小値
             let INTERVAL = LEVELS[currentLevel].interval; // 数字表示間の秒数（ms） 
+            let ISSIGN = LEVELS[currentLevel].isSign;
             
             const DELAY = 3500; // 各種delay(ms)
             
@@ -332,7 +343,12 @@
                 console.log('★ showNumber: ' + count + '回目 ★');
                 let random;
                 do {
-                    const sign = Math.random() < 0.5 ? -1 : 1;
+                    let sign;
+                    if(ISSIGN == 0){
+                        sign = 1;
+                    }else{
+                        sign = Math.random() < 0.5 ? -1 : 1;
+                    }
                     random = Math.floor(Math.random() * (MAXNUM - MINNUM + 1)) + MINNUM; 
                     if(sign === -1 && random !== 0 && count !== 0 && total >= random){
                         random *= -1;
@@ -404,7 +420,8 @@
                         MAXCOUNT = selectedLevel.maxCount; // 設問数
                         MAXNUM = selectedLevel.maxNum; // 1回に表示する数字の最大値
                         MINNUM = selectedLevel.minNum; // 1回に表示する数字の最小値
-                        INTERVAL = selectedLevel.interval; // 数字表示間の秒数（ms
+                        INTERVAL = selectedLevel.interval; // 数字表示間の秒数（ms)
+                        ISSIGN = selectedLevel.isSign;
                     }else{
                         console.log('不正');
                     }
