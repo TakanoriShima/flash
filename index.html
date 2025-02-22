@@ -30,6 +30,7 @@
             text-align: center;
             color: white;
             font-weight: bold;
+            opacity: 1 !important;
         }
         button#start {
             font-size: 2.2rem;
@@ -42,10 +43,7 @@
             font-size: 12rem;
             font-weight: bold;
             opacity: 1;
-            transition: all 3s ease-in-out;
-        }
-        .grow {
-            font-size: 15rem !important;
+            transition: all 1s ease-in-out;
         }
 
         .fade-out {
@@ -210,7 +208,7 @@
             // レベル定義
             const LEVELS = {
                 '1': {
-                        maxCount: 4,
+                        maxCount: 5,
                         maxNum: 9,
                         minNum: 1,
                         interval: 3000
@@ -296,6 +294,7 @@
             const calc = document.getElementById('calc');
             const challenge = document.getElementById('challenge');
             const container = document.querySelector(".container");
+
             const InitStartButtonElement = container.children[2];  // 3つ目の要素
             const InitResetButtonElement = container.children[3];  // 4つ目の要素
 
@@ -303,8 +302,22 @@
             let startTimer; // 数字表示アニメーション
             let stopTimer; // 結果表示アニメーション
 
+            let isRunning = false;
+
+            const showNode = () => {
+                console.log(container.children.length);
+            }
+
+            const getIsRunning = () => {
+                return isRunning;
+            }
+
+            showNode();
+
             InitResetButtonElement.remove();
-            
+
+            showNode();
+
             // DELAYの非同期処理用
             const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -346,8 +359,11 @@
                     }
                     music.currentTime = 0;
                     music.play();
+                    // container.children[2].remove();
+
                     await delay(INTERVAL);
                     dispNumber.textContent = '';
+
                     showResult();
                 }else{
                     count++;
@@ -367,6 +383,7 @@
             const showResult = async() => {
                 console.log('-- showResult関数実行-- ');
 
+                InitResetButtonElement.remove();
                 input.classList.remove('fade-out');
                 calc.classList.remove('fade-out');
                 console.log('★ 最終結果（' + total + '）画面表示！');
@@ -378,15 +395,19 @@
                 levels[i].addEventListener('click', (e) => {
                     let selectedLevelValue = e.target.dataset.value;
                     console.log('選択されたLevelは' + selectedLevelValue);
-                    currentLevel = selectedLevelValue;
-                    let selectedLevel = LEVELS[selectedLevelValue];
-                    console.log(selectedLevel);
-                    showStartButtonContent(selectedLevelValue)
-                    // 各種変数の設定
-                    MAXCOUNT = selectedLevel.maxCount; // 設問数
-                    MAXNUM = selectedLevel.maxNum; // 1回に表示する数字の最大値
-                    MINNUM = selectedLevel.minNum; // 1回に表示する数字の最小値
-                    INTERVAL = selectedLevel.interval; // 数字表示間の秒数（ms） 
+                    if(!getIsRunning()){
+                        currentLevel = selectedLevelValue;
+                        let selectedLevel = LEVELS[selectedLevelValue];
+                        console.log(selectedLevel);
+                        showStartButtonContent(selectedLevelValue)
+                        // 各種変数の設定
+                        MAXCOUNT = selectedLevel.maxCount; // 設問数
+                        MAXNUM = selectedLevel.maxNum; // 1回に表示する数字の最大値
+                        MINNUM = selectedLevel.minNum; // 1回に表示する数字の最小値
+                        INTERVAL = selectedLevel.interval; // 数字表示間の秒数（ms
+                    }else{
+                        console.log('不正');
+                    }
 
                     const bsCollapse = new bootstrap.Collapse(navbarCollapse, { toggle: true });
                 });
@@ -394,8 +415,11 @@
 
             // 開始ボタンを押した時のイベント処理
             startButton.addEventListener('click', async () => {
-                container.children[2].remove();
+
+                isRunning = true;
+                InitStartButtonElement.remove();
                 container.insertBefore(InitResetButtonElement, container.children[2]);
+
                 input.classList.add('fade-out');
                 calc.classList.add('fade-out');
 
@@ -449,6 +473,7 @@
                     music.play();
                     console.log('正解');
                 }else{
+                    
                     result.textContent = 'X';
                     const music = new Audio('./audios/fail.mp3');
                     music.currentTime = 0;
@@ -456,17 +481,23 @@
                     console.log('不正解');
                 }
                 await delay(DELAY);
-                container.children[2].remove();
-                container.insertBefore(InitStartButtonElement, container.children[2]);
+                result.classList.remove('fade-out');
+                dispNumber.classList.add('fade-out');
                 startButton.disabled = false;
+                isRunning = false;
+                
+
                 showStartButtonContent(currentLevel);
+                
+                InitResetButtonElement.remove();
+                container.insertBefore(InitStartButtonElement, container.children[2]);
                 
             });
 
             // リセットボタンを押した時のイベント処理
             resetButton.addEventListener('click', () => {
+                isReset = true;
                 clearInterval(startTimer);
-
                 container.children[2].remove();
                 console.log(InitStartButtonElement);
                 container.insertBefore(InitStartButtonElement, container.children[2]);
@@ -476,6 +507,7 @@
                 startButton.disabled = false;
                 showStartButtonContent(currentLevel);
                 dispNumber.textContent = '';
+                isRunning = false;
                 
             });
         }
